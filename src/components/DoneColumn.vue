@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "Testing"
+  name: "DoneColumn"
 }
 </script>
 

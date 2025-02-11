@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "InProgress"
+  name: "InProgressColumn"
 }
 </script>
 

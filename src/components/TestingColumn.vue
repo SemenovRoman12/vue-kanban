@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: "TaskForm"
+  name: "TestingColumn"
 }
 </script>
 
