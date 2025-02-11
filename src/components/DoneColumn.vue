@@ -1,13 +1,6 @@
 <template>
   <div class="column-container">
-    <h2>Запланированные задачи</h2>
-
-    <div class="create-task-form">
-      <input v-model="newTaskTitle" type="text" placeholder="Заголовок" />
-      <textarea v-model="newTaskDescription" placeholder="Описание"></textarea>
-      <input v-model="newTaskDeadline" type="date" />
-      <button @click="onCreateTask">Добавить</button>
-    </div>
+    <h2>Выполненные задачи</h2>
 
     <div v-for="task in tasks" :key="task.id" class="task-card">
       <h3>{{ task.title }}</h3>
@@ -16,97 +9,32 @@
       <p><strong>Дэдлайн:</strong> {{ formatDate(task.deadline) }}</p>
       <p><strong>Последнее редактирование:</strong> {{ formatDate(task.lastEdit) }}</p>
 
-      <button @click="onEditTask(task)">Редактировать</button>
-      <button @click="onDeleteTask(task.id)">Удалить</button>
-      <button @click="onMoveTask(task)">Переместить в 'В работе'</button>
-    </div>
+      <p>
+        <strong>Статус:</strong>
+        <span v-if="task.isOverdue">Просрочена</span>
+        <span v-else>Выполнена в срок</span>
+      </p>
 
-    <div v-if="editingTask" class="modal-backdrop">
-      <div class="modal">
-        <h3>Редактировать задачу</h3>
-        <input v-model="editTitle" type="text" placeholder="Заголовок" />
-        <textarea v-model="editDescription" placeholder="Описание"></textarea>
-        <input v-model="editDeadline" type="date" />
-
-        <button @click="saveEdit">Сохранить</button>
-        <button @click="cancelEdit">Отмена</button>
-      </div>
+      <p v-if="task.returnReason">
+        <strong>Причина возврата (если была):</strong> {{ task.returnReason }}
+      </p>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'TodoColumn',
+  name: 'DoneColumn',
   props: {
     tasks: {
       type: Array,
       required: true
     }
   },
-  data() {
-    return {
-      newTaskTitle: '',
-      newTaskDescription: '',
-      newTaskDeadline: '',
-      editingTask: null,
-      editTitle: '',
-      editDescription: '',
-      editDeadline: ''
-    }
-  },
   methods: {
     formatDate(date) {
       if (!date) return '';
       return new Date(date).toLocaleString();
-    },
-    onCreateTask() {
-      if (!this.newTaskTitle.trim()) {
-        alert('Пожалуйста, введите заголовок задачи');
-        return;
-      }
-      this.$emit('create-task', {
-        title: this.newTaskTitle,
-        description: this.newTaskDescription,
-        deadline: this.newTaskDeadline
-      });
-      this.newTaskTitle = '';
-      this.newTaskDescription = '';
-      this.newTaskDeadline = '';
-    },
-    onEditTask(task) {
-      this.editingTask = { ...task };
-      this.editTitle = task.title;
-      this.editDescription = task.description;
-      this.editDeadline = this.formatDateForInput(task.deadline);
-    },
-    formatDateForInput(date) {
-      const d = new Date(date);
-      const year = d.getFullYear();
-      let month = (d.getMonth() + 1).toString().padStart(2, '0');
-      let day = d.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-    saveEdit() {
-      this.$emit('edit-task', {
-        id: this.editingTask.id,
-        title: this.editTitle,
-        description: this.editDescription,
-        deadline: this.editDeadline
-      });
-      this.editingTask = null;
-    },
-    cancelEdit() {
-      this.editingTask = null;
-    },
-    onDeleteTask(id) {
-      this.$emit('delete-task', id);
-    },
-    onMoveTask(task) {
-      this.$emit('move-task', {
-        id: task.id,
-        newStatus: 'in-progress'
-      });
     }
   }
 }
@@ -120,19 +48,6 @@ export default {
   flex: 1;
 }
 
-.create-task-form {
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.create-task-form input,
-.create-task-form textarea {
-  margin-bottom: 5px;
-  padding: 6px;
-  font-size: 14px;
-}
-
 .task-card {
   background-color: #fff;
   margin-bottom: 10px;
@@ -142,27 +57,5 @@ export default {
 
 .task-card + .task-card {
   margin-top: 10px;
-}
-
-button {
-  margin-right: 5px;
-  cursor: pointer;
-}
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0,0,0,0.5);
-}
-
-.modal {
-  background-color: #fff;
-  width: 300px;
-  padding: 20px;
-  margin: 100px auto;
-  border-radius: 4px;
 }
 </style>
